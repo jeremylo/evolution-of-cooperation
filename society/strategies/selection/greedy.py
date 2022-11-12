@@ -1,12 +1,14 @@
-from random import choice, random
-from typing import Dict
+from random import random, randrange
+from typing import Dict, List
+
+import numpy as np
 
 from society.strategy import SelectionStrategy
 
 
 class GreedySelectionStrategy(SelectionStrategy):
     def select_partner(self, returns: Dict[int, float]) -> int:
-        return max(returns, key=lambda i: sum(returns[i]))
+        return np.argmax([sum(r) for r in returns])
 
 
 class EGreedySelectionStrategy(SelectionStrategy):
@@ -14,8 +16,8 @@ class EGreedySelectionStrategy(SelectionStrategy):
         super().__init__()
         self.epsilon = epsilon
 
-    def select_partner(self, returns: Dict[int, float]) -> int:
+    def select_partner(self, returns: List[List[float]]) -> int:
         if random() < self.epsilon:
-            return choice(list(returns.keys()))
+            return randrange(len(returns))
 
-        return max(returns, key=lambda i: sum(returns[i]))
+        return np.argmax([sum(r) for r in returns])

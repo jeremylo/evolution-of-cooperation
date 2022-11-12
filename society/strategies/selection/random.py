@@ -1,9 +1,9 @@
-from random import choice
-from typing import Dict
+from random import randrange
+from typing import Dict, List
 
 from society.strategy import SelectionStrategy
 
 
 class RandomSelectionStrategy(SelectionStrategy):
-    def select_partner(self, returns: Dict[int, float]) -> int:
-        return choice(list(returns.keys()))
+    def select_partner(self, returns: Dict[int, List[float]]) -> int:
+        return randrange(len(returns))

@@ -15,5 +15,5 @@ class GameplayStrategy:
 
 
 class SelectionStrategy:
-    def select(self, returns: Dict[int, float]) -> int:
+    def select(self, returns: Dict[int, List[float]]) -> int:
         raise NotImplementedError()

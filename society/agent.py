@@ -1,4 +1,6 @@
-from typing import Dict
+from typing import List
+
+import numpy as np
 
 from society.strategy import GameplayStrategy, SelectionStrategy
 
@@ -9,14 +11,30 @@ class Agent:
     gameplay_strategy: GameplayStrategy
 
     def __init__(
-        self, selection_strategy: SelectionStrategy, gameplay_strategy: GameplayStrategy
+        self,
+        selection_strategy: SelectionStrategy,
+        gameplay_strategy: GameplayStrategy,
+        index: int = None,
+        population: int = None,
     ) -> None:
         self.selection_strategy = selection_strategy
         self.gameplay_strategy = gameplay_strategy
+        self.index = index
+        self.population = population
 
-    def select_partner(self, returns: Dict[int, float]) -> int:
-        return self.selection_strategy.select_partner(returns)
+    def set_index(self, index: int, population: int):
+        self.index = index
+        self.population = population
+
+    def select_partner(self, state: List[float]) -> int:
+        return (
+            self.selection_strategy.select_partner(np.roll(state, -self.index))
+            + self.index
+        ) % self.population
 
 
-class TrainableAgent:
-    pass
+class TrainableAgent(Agent):
+    def update_selector(
+        self, old_state: List[float], new_state: List[float], reward: float
+    ):
+        self.selection_strategy.update(old_state, new_state, reward)

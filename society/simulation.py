@@ -9,11 +9,15 @@ class Simulation:
     returns: Dict[int, Dict[int, float]]
 
     def __init__(self, agents: List[Agent]) -> None:
-        self.agents = {index: agent for index, agent in enumerate(agents)}
-        self.returns = {i: {j: [] for j in self.agents} for i in self.agents}
+        self.agents = agents
+        self.returns = [[[0] for _ in self.agents] for _ in self.agents]
+
+        population = len(self.agents)
+        for i, agent in enumerate(self.agents):
+            agent.set_index(i, population)
 
     def play_round(self) -> None:
-        for index, agent in self.agents.items():
+        for index, agent in enumerate(self.agents):
             partner_index = agent.select_partner(self.returns[index])
             if index != partner_index:
                 score1, score2 = Match(
