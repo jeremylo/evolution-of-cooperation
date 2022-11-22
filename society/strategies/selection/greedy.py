@@ -7,8 +7,11 @@ from society.strategy import SelectionStrategy
 
 
 class GreedySelectionStrategy(SelectionStrategy):
-    def select_partner(self, returns: Dict[int, float]) -> int:
-        return np.argmax([sum(r) for r in returns])
+    def select_partner(self, returns: List[List[float]]) -> int:
+        try:
+            return np.mean(returns, axis=1, dtype=object).argmax()
+        except:
+            return randrange(len(returns))
 
 
 class EGreedySelectionStrategy(SelectionStrategy):
@@ -20,4 +23,7 @@ class EGreedySelectionStrategy(SelectionStrategy):
         if random() < self.epsilon:
             return randrange(len(returns))
 
-        return np.argmax([sum(r) for r in returns])
+        try:
+            return np.mean(returns, axis=1, dtype=object).argmax()
+        except:
+            return randrange(len(returns))

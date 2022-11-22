@@ -27,14 +27,15 @@ class Agent:
         self.population = population
 
     def select_partner(self, state: List[float]) -> int:
-        return (
-            self.selection_strategy.select_partner(np.roll(state, -self.index))
-            + self.index
-        ) % self.population
+        partner = self.selection_strategy.select_partner(np.roll(state, -self.index))
+
+        assert partner in range(self.population)
+
+        return (partner + self.index) % self.population
 
 
 class TrainableAgent(Agent):
     def update_selector(
-        self, old_state: List[float], new_state: List[float], reward: float
+        self, old_state: List[List[float]], new_state: List[List[float]], reward: float
     ):
         self.selection_strategy.update(old_state, new_state, reward)

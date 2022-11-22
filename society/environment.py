@@ -21,7 +21,7 @@ class SelectionEnvironment:
             agent.set_index(i, self.population)
             self.returns.append([0.0])
 
-        return [np.nan_to_num(np.mean(r)) for r in self.returns]
+        return [np.nan_to_num(np.mean(r, dtype=object)) for r in self.returns]
 
     def step(self, action: int):
         if action != 0:
@@ -31,6 +31,10 @@ class SelectionEnvironment:
             ).play(limit=100)
 
             self.returns[action].append(score1)
-            return [np.nan_to_num(np.mean(r)) for r in self.returns], score1, False
+            return (
+                [np.nan_to_num(np.mean(r, dtype=object)) for r in self.returns],
+                score1,
+                False,
+            )
 
-        return [np.nan_to_num(np.mean(r)) for r in self.returns], 0, False
+        return [np.nan_to_num(np.mean(r, dtype=object)) for r in self.returns], 0, False

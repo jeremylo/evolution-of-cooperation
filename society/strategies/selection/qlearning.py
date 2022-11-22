@@ -46,24 +46,27 @@ class QLearningSelectionStrategy(SelectionStrategy):
         self._loss = 0.0
         self._count = 0
 
-    def select_partner(self, returns: List[float]) -> int:
+    def select_partner(self, returns: List[List[float]]) -> int:
         if random() < self._epsilon:
-            return randrange(len(returns))
+            return randrange(self.population_size)
 
-        return torch.argmax(self._q_network(torch.tensor(returns, dtype=torch.float)))
+        return int(torch.argmax(self._q_network(to_state(returns))))
 
-    def update(self, old_state: List[float], new_state: List[float], reward: float):
-        prediction = self._q_network(torch.tensor(old_state, dtype=torch.float)).max()
+    def update(
+        self, old_state: List[List[float]], new_state: List[List[float]], reward: float
+    ):
         target = (
-            reward
-            + self._discount_rate
-            * self._q_network(torch.tensor(new_state, dtype=torch.float)).max()
+            reward + self._discount_rate * self._q_network(to_state(new_state)).max()
         )
 
         self._optimiser.zero_grad()
-        loss = self._criterion(prediction, target)
+        loss = self._criterion(self._q_network(to_state(old_state)).max(), target)
         self._loss += float(loss)
         loss.backward()
         self._optimiser.step()
 
         self._count += 1
+
+
+def to_state(returns):
+    return torch.tensor([np.nan_to_num(np.mean(r)) for r in returns], dtype=torch.float)

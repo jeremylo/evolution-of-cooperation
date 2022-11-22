@@ -10,7 +10,9 @@ class BasicSimulation:
 
     def __init__(self, agents: List[Agent]) -> None:
         self.agents = agents
-        self.returns = [[[0] for _ in self.agents] for _ in self.agents]
+        self.returns = [
+            [[] for j in range(self.population)] for i in range(self.population)
+        ]
 
         population = len(self.agents)
         for i, agent in enumerate(self.agents):
