@@ -1,5 +1,7 @@
 from random import random
 
+import numpy as np
+
 from society.action import Action, flip_action
 from society.strategy import GameplayStrategy
 
@@ -18,6 +20,8 @@ class Match:
         self.strategy1 = strategy1
         self.strategy2 = strategy2
 
+        self.total_moves = np.clip(np.random.geometric(0.00346), 1, 1000)
+
     def _mutate(self, action: Action, noise: float):
         if 0 < random() < noise:
             return flip_action(action)
@@ -34,8 +38,7 @@ class Match:
         self.strategy1.on_match_start()
         self.strategy2.on_match_start()
 
-        i = 0
-        while i < limit and (i < 1 or random() < continuation_probability):
+        for _ in range(min(self.total_moves, limit)):
             move1 = self._mutate(self.strategy1.play_move(history1, history2), noise)
             move2 = self._mutate(self.strategy2.play_move(history2, history1), noise)
 
@@ -46,7 +49,6 @@ class Match:
             history1.append(move1)
             history2.append(move2)
 
-            i += 1
             yield (move1, move2), (score1, score2), (increase1, increase2)
 
         self.strategy1.on_match_end()

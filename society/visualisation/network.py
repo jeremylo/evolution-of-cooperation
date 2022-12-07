@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+import numpy as np
 
 
 def make_graph(returns):
@@ -59,6 +60,20 @@ def plot_graph(G, title: str = None):
         connectionstyle="arc3, rad = 0.2",
         # arrowstyle="Simple",
     )
+
+
+def plot_matrix(matrix, digits=0, figsize=(18, 10)):
+    fig = plt.figure(figsize=figsize)
+    ax = fig.add_subplot(111)
+    m = ax.matshow(matrix)
+    fig.colorbar(m)
+
+    for (i, j), z in np.ndenumerate(matrix):
+        ax.text(
+            j, i, round(z, digits), ha="center", va="center", color="white"
+        )  # bbox=dict(boxstyle='round', facecolor='white', edgecolor='0.3')
+
+    # return fig
 
 
 def print_returns(returns):
