@@ -10,6 +10,9 @@ class GameplayStrategy:
     def on_match_end(self):
         pass
 
+    def update(self, reward: int, history: List[Action], opp_history: List[Action]):
+        pass
+
     def play_move(self, history: List[Action], opp_history: List[Action]) -> Action:
         raise NotImplementedError()
 

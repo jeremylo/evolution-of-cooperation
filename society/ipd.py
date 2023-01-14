@@ -13,6 +13,13 @@ PAYOFF_MATRIX = {
 }
 
 
+def mutate_move(action: Action, noise: float):
+    if 0 < random() < noise:
+        return flip_action(action)
+
+    return action
+
+
 class Match:
     def __init__(
         self, strategy1: GameplayStrategy, strategy2: GameplayStrategy
@@ -21,12 +28,6 @@ class Match:
         self.strategy2 = strategy2
 
         self.total_moves = np.clip(np.random.geometric(0.00346), 1, 1000)
-
-    def _mutate(self, action: Action, noise: float):
-        if 0 < random() < noise:
-            return flip_action(action)
-
-        return action
 
     def play_moves(self, continuation_probability: float, limit: int, noise: float):
         score1 = 0
@@ -39,8 +40,8 @@ class Match:
         self.strategy2.on_match_start()
 
         for _ in range(min(self.total_moves, limit)):
-            move1 = self._mutate(self.strategy1.play_move(history1, history2), noise)
-            move2 = self._mutate(self.strategy2.play_move(history2, history1), noise)
+            move1 = mutate_move(self.strategy1.play_move(history1, history2), noise)
+            move2 = mutate_move(self.strategy2.play_move(history2, history1), noise)
 
             increase1, increase2 = PAYOFF_MATRIX[(move1, move2)]
             score1 += increase1

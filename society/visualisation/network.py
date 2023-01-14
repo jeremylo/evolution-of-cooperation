@@ -62,6 +62,38 @@ def plot_graph(G, title: str = None):
     )
 
 
+def plot_graph_spring(G, title: str = None):
+    plt.figure()
+    pos = nx.spring_layout(G, k=2 / (G.order() ** 0.5))
+
+    colors = []
+    weights = []
+    for (u, v, attrib_dict) in list(G.edges.data()):
+        weights.append(attrib_dict["weight"])
+        if u <= v:
+            colors.append("blue")
+        else:
+            colors.append("green")
+
+    max_weight = max(weights)
+    weights = [weight / max_weight * 10 for weight in weights]
+
+    if title:
+        ax = plt.gca()
+        ax.set_title(title)
+
+    nx.draw(
+        G,
+        pos,
+        font_color="white",
+        node_shape="s",
+        with_labels=True,
+        width=weights,
+        edge_color=colors,
+        connectionstyle="arc3, rad = 0.2",
+    )
+
+
 def plot_matrix(matrix, digits=0, figsize=(18, 10)):
     fig = plt.figure(figsize=figsize)
     ax = fig.add_subplot(111)
