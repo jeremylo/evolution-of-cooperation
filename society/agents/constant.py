@@ -1,14 +1,14 @@
 from typing import List
 
 from society.action import Action
-from society.strategy import GameplayStrategy
+from society.agent import Agent
 
 
-class AllC(GameplayStrategy):
+class AllC(Agent):
     def play_move(self, history: List[Action], opp_history: List[Action]) -> Action:
         return Action.COOPERATE
 
 
-class AllD(GameplayStrategy):
+class AllD(Agent):
     def play_move(self, history: List[Action], opp_history: List[Action]) -> Action:
         return Action.DEFECT

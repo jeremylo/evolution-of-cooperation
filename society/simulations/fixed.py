@@ -5,10 +5,10 @@ import numpy as np
 
 from society.action import Action
 from society.agent import Agent
-from society.ipd import PAYOFF_MATRIX, Match
+from society.ipd import PAYOFF_MATRIX
 
 
-class WeightedNetworkSimulation:
+class FixedWeightSimulation:
     agents: Dict[int, Agent]
     rewards: List[List[List[int]]]
     action_histories: List[List[List[Action]]]
@@ -19,8 +19,6 @@ class WeightedNetworkSimulation:
         self.weights = weights
 
         self.population = len(self.agents)
-        for i, agent in enumerate(self.agents):
-            agent.set_index(i, self.population)
 
     def reset(self) -> None:
         self.rewards = [
@@ -32,10 +30,10 @@ class WeightedNetworkSimulation:
         self.reward_histories = [[] for i in range(self.population)]
 
     def play_move(self, a, b, train=True):
-        move1 = self.agents[a].gameplay_strategy.play_move(
+        move1 = self.agents[a].play_move(
             self.action_histories[a][b], self.action_histories[b][a]
         )
-        move2 = self.agents[b].gameplay_strategy.play_move(
+        move2 = self.agents[b].play_move(
             self.action_histories[b][a], self.action_histories[a][b]
         )
 
@@ -51,10 +49,10 @@ class WeightedNetworkSimulation:
         self.reward_histories[b].append(reward2)
 
         if train:
-            self.agents[a].gameplay_strategy.update(
+            self.agents[a].update(
                 reward1, self.action_histories[a][b], self.action_histories[b][a]
             )
-            self.agents[b].gameplay_strategy.update(
+            self.agents[b].update(
                 reward2, self.action_histories[b][a], self.action_histories[a][b]
             )
 

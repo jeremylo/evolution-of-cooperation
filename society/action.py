@@ -1,8 +1,8 @@
-from enum import Enum
+from enum import IntEnum
 from random import choice
 
 
-class Action(Enum):
+class Action(IntEnum):
     COOPERATE = 0
     DEFECT = 1
 

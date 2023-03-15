@@ -1,10 +1,10 @@
 from typing import List
 
 from society.action import Action
-from society.strategy import GameplayStrategy
+from society.agent import Agent
 
 
-class TitForTat(GameplayStrategy):
+class TitForTat(Agent):
     def play_move(self, history: List[Action], opp_history: List[Action]) -> Action:
         # Cooperate initially
         if not opp_history:

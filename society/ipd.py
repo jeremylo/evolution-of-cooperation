@@ -3,7 +3,7 @@ from random import random
 import numpy as np
 
 from society.action import Action, flip_action
-from society.strategy import GameplayStrategy
+from society.agent import Agent
 
 PAYOFF_MATRIX = {
     (Action.COOPERATE, Action.COOPERATE): (3, 3),
@@ -22,10 +22,10 @@ def mutate_move(action: Action, noise: float):
 
 class Match:
     def __init__(
-        self, strategy1: GameplayStrategy, strategy2: GameplayStrategy
+        self, agent1: Agent, agent2: Agent
     ) -> None:
-        self.strategy1 = strategy1
-        self.strategy2 = strategy2
+        self.agent1 = agent1
+        self.agent2 = agent2
 
         self.total_moves = np.clip(np.random.geometric(0.00346), 1, 1000)
 
@@ -36,12 +36,9 @@ class Match:
         history1 = []
         history2 = []
 
-        self.strategy1.on_match_start()
-        self.strategy2.on_match_start()
-
         for _ in range(min(self.total_moves, limit)):
-            move1 = mutate_move(self.strategy1.play_move(history1, history2), noise)
-            move2 = mutate_move(self.strategy2.play_move(history2, history1), noise)
+            move1 = mutate_move(self.agent1.play_move(history1, history2), noise)
+            move2 = mutate_move(self.agent2.play_move(history2, history1), noise)
 
             increase1, increase2 = PAYOFF_MATRIX[(move1, move2)]
             score1 += increase1
@@ -51,9 +48,6 @@ class Match:
             history2.append(move2)
 
             yield (move1, move2), (score1, score2), (increase1, increase2)
-
-        self.strategy1.on_match_end()
-        self.strategy2.on_match_end()
 
     def play(
         self, continuation_probability: float = 1, limit: int = 500, noise: float = 0

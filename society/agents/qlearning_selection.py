@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from society.strategy import SelectionStrategy
+from society.strategies import SelectionStrategy
 
 
 class QNetwork(nn.Module):
