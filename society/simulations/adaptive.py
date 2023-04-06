@@ -16,7 +16,7 @@ class AdaptiveSimulation:
     action_histories: List[List[List[Action]]]
     reward_histories: List[List[int]]
 
-    def __init__(self, agents: List[Agent], weights: np.ndarray) -> None:
+    def __init__(self, agents: List[Agent], weights: np.ndarray, payoff_matrix=None) -> None:
         self.agents = agents
         self.population = len(self.agents)
 
@@ -27,6 +27,8 @@ class AdaptiveSimulation:
 
         self.weights = None
         self.differences = []
+
+        self.payoff_matrix = payoff_matrix if payoff_matrix is not None else PAYOFF_MATRIX
 
     def reset(self) -> None:
         self.rewards = [
@@ -50,7 +52,7 @@ class AdaptiveSimulation:
         self.action_histories[a][b].append(move1)
         self.action_histories[b][a].append(move2)
 
-        reward1, reward2 = PAYOFF_MATRIX[(move1, move2)]
+        reward1, reward2 = self.payoff_matrix[(move1, move2)]
 
         self.rewards[a][b].append(reward1)
         self.rewards[b][a].append(reward2)
@@ -101,10 +103,11 @@ class AdaptiveSimulation:
     def produce_weight_matrix(self):
         weights = self.get_weights_by_agent()
 
-        matrix = np.zeros((self.population, self.population))
+        matrix = np.full((self.population, self.population), -np.inf)
         for index in range(self.population):
             for partner, weight in zip(self.connections[index], weights[index]):
-                matrix[index, partner] = weight
+                if index != partner:
+                    matrix[index, partner] = weight
 
         return matrix
 

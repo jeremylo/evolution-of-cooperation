@@ -1,5 +1,5 @@
 from random import choice, random
-from typing import List, Optional
+from typing import List
 
 import numpy as np
 
@@ -8,6 +8,8 @@ from society.agent import Agent
 
 
 class DoubleTabularQLearner(Agent):
+    sa = Agent.__init__
+
     def __init__(
         self,
         lookback: int = 1,
@@ -23,6 +25,15 @@ class DoubleTabularQLearner(Agent):
         self._discount_factor = discount_factor
         self._q_table1 = np.zeros(shape=tuple(4 for _ in range(self._lookback)) + (2,))
         self._q_table2 = np.zeros(shape=tuple(4 for _ in range(self._lookback)) + (2,))
+
+    @property
+    def parameters(self) -> dict:
+        return {
+            "lookback": self._lookback,
+            "epsilon": self._epsilon,
+            "learning_rate": self._learning_rate,
+            "discount_factor": self._discount_factor,
+        }
 
     @property
     def _q_table(self):
@@ -41,7 +52,7 @@ class DoubleTabularQLearner(Agent):
 
     def play_move(self, history: List[Action], opp_history: List[Action]) -> Action:
         # Play a random move
-        if random() < self._epsilon:  # len(history) < self._lookback or
+        if self.training and random() < self._epsilon:
             return choice((Action.COOPERATE, Action.DEFECT))
 
         # Return the action corresponding to

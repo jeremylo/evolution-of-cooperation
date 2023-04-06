@@ -28,6 +28,15 @@ class TabularQLearner(Agent):
             else np.zeros(shape=tuple(4 for _ in range(self._lookback)) + (2,))
         )
 
+    @property
+    def parameters(self) -> dict:
+        return {
+            "lookback": self._lookback,
+            "epsilon": self._epsilon,
+            "learning_rate": self._learning_rate,
+            "discount_factor": self._discount_factor,
+        }
+
     def _to_state(self, history: List[Action], opp_history: List[Action]) -> tuple:
         state = tuple(
             2 * a.value + b.value
