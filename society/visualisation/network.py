@@ -35,7 +35,7 @@ def plot_graph(G, title: str = None):
 
     colors = []
     weights = []
-    for (u, v, attrib_dict) in list(G.edges.data()):
+    for u, v, attrib_dict in list(G.edges.data()):
         weights.append(attrib_dict["weight"])
         if u <= v:
             colors.append("blue")
@@ -58,7 +58,6 @@ def plot_graph(G, title: str = None):
         width=weights,
         edge_color=colors,
         connectionstyle="arc3, rad = 0.2",
-        # arrowstyle="Simple",
     )
 
 
@@ -68,7 +67,7 @@ def plot_graph_spring(G, title: str = None):
 
     colors = []
     weights = []
-    for (u, v, attrib_dict) in list(G.edges.data()):
+    for u, v, attrib_dict in list(G.edges.data()):
         weights.append(attrib_dict["weight"])
         if u <= v:
             colors.append("blue")
@@ -101,11 +100,7 @@ def plot_matrix(matrix, digits=0, figsize=(18, 10)):
     fig.colorbar(m)
 
     for (i, j), z in np.ndenumerate(matrix):
-        ax.text(
-            j, i, round(z, digits), ha="center", va="center", color="white"
-        )  # bbox=dict(boxstyle='round', facecolor='white', edgecolor='0.3')
-
-    # return fig
+        ax.text(j, i, round(z, digits), ha="center", va="center", color="white")
 
 
 def print_returns(returns):
@@ -114,6 +109,16 @@ def print_returns(returns):
 
 
 def plot_degree_distribution(G, t=None):
+    """Plots the degree distribution of a network.
+
+    Code based on the documentation example available at the following URL:
+    https://networkx.org/documentation/stable/auto_examples/drawing/plot_degree.html
+
+    Args:
+        G (networkx.Graph): The graph.
+        t (float, optional): The threshold. Defaults to None.
+    """
+
     degree_sequence = sorted((d for _, d in G.degree()), reverse=True)
 
     title = "Graph degree"
@@ -121,6 +126,7 @@ def plot_degree_distribution(G, t=None):
         title += f" (threshold={t})"
 
     fig = plt.figure(title, figsize=(8, 8))
+
     # Create a gridspec for adding subplots of different sizes
     axgrid = fig.add_gridspec(5, 4)
 
