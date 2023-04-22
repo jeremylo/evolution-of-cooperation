@@ -1,6 +1,6 @@
 from datetime import datetime
 from itertools import product
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 import networkx as nx
 import numpy as np
@@ -42,8 +42,13 @@ def calculate_cooperativeness(history):
     return count / len(history)
 
 
-def generate_population(generate_agents: Callable[[int], List[Agent]], population: int):
-    agents = generate_agents(population)
+def generate_population(
+    generate_agents: Callable[[int], List[Agent]],
+    population: int,
+    generation_kwargs: Optional[dict] = None,
+):
+    kwargs = {} if generation_kwargs is None else generation_kwargs
+    agents = generate_agents(population, **kwargs)
 
     G = nx.complete_graph(population)
 
@@ -59,7 +64,7 @@ def generate_population(generate_agents: Callable[[int], List[Agent]], populatio
 
 
 def find_weight_peaks(weights):
-    r = np.arange(-0.1, 1.1, 0.001)
+    r = np.arange(-0.2, 1.2, 0.001)
 
     try:
         kernel = gaussian_kde([w for w in weights.ravel() if w >= 0])

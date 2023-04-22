@@ -1,3 +1,4 @@
+import json
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from itertools import chain
 from typing import Callable, List
@@ -14,13 +15,21 @@ def do_run(
     generate_agents: Callable[[int], List[Agent]],
     population: int,
     train_rounds: int = 10_000,
-    test_rounds: int = 1_000,
+    test_rounds: int = 10_000,
+    payoff_matrix=None,
+    metadata=None,
+    generation_args=None,
 ) -> dict:
     # Generate a new population
-    agents, weights_matrix, G = generate_population(generate_agents, population)
+    agents, weights_matrix, G = generate_population(
+        generate_agents, population, generation_args
+    )
+
+    for agent in agents:
+        agent.train()
 
     # Run a number of rounds
-    sim = AdaptiveSimulation(agents, weights_matrix)
+    sim = AdaptiveSimulation(agents, weights_matrix, payoff_matrix)
 
     # Run the training phase
     train_society_rewards = []
@@ -58,6 +67,7 @@ def do_run(
     return {
         "population": population,
         "agents": agents,
+        "agent_args": generation_args,
         "agent_policies": agent_policies,
         "train_rounds": train_rounds,
         "train_society_rewards": train_society_rewards,
@@ -73,6 +83,7 @@ def do_run(
         "test_cooperation": test_cooperation,
         "test_returns": test_returns,
         "test_peaks": test_peaks,
+        "metadata": metadata,
     }
 
 
@@ -96,9 +107,17 @@ def do_runs(args, max_workers=24):
                 )
 
                 p.write(
-                    f'#{i + 1:<4} {result["population"]:<6} {result["train_mean_reward"]:<10.3f} {result["test_mean_reward"]:<10.3f} {str([round(r, 3) for r in train_peaks]):<28} {str([round(r, 3) for r in test_peaks]):<20}'
+                    f'#{i + 1:<6} {result["population"]:<6} {result["train_mean_reward"]:<10.3f} {result["test_mean_reward"]:<10.3f} {str([round(r, 3) for r in train_peaks]):<28} {str([round(r, 3) for r in test_peaks]):<20} {result["agent_args"]}'
                 )
 
                 p.update(1)
 
                 yield result
+
+
+class Encoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+
+        return json.JSONEncoder.default(self, obj)
