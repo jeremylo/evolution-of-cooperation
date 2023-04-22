@@ -1,4 +1,4 @@
-from random import choices
+from random import choices, sample
 from typing import Dict, List
 
 import numpy as np
@@ -7,8 +7,6 @@ from society.action import Action
 from society.agent import Agent
 from society.ipd import PAYOFF_MATRIX
 
-K = 50
-
 
 class AdaptiveSimulation:
     agents: Dict[int, Agent]
@@ -16,7 +14,9 @@ class AdaptiveSimulation:
     action_histories: List[List[List[Action]]]
     reward_histories: List[List[int]]
 
-    def __init__(self, agents: List[Agent], weights: np.ndarray, payoff_matrix=None) -> None:
+    def __init__(
+        self, agents: List[Agent], weights: np.ndarray, payoff_matrix=None
+    ) -> None:
         self.agents = agents
         self.population = len(self.agents)
 
@@ -28,7 +28,9 @@ class AdaptiveSimulation:
         self.weights = None
         self.differences = []
 
-        self.payoff_matrix = payoff_matrix if payoff_matrix is not None else PAYOFF_MATRIX
+        self.payoff_matrix = (
+            payoff_matrix if payoff_matrix is not None else PAYOFF_MATRIX
+        )
 
     def reset(self) -> None:
         self.rewards = [
@@ -60,7 +62,7 @@ class AdaptiveSimulation:
         self.reward_histories[a].append(reward1)
         self.reward_histories[b].append(reward2)
 
-        if move1 == move2 == Action.COOPERATE:
+        if move1 == Action.COOPERATE and move2 == Action.COOPERATE:
             self.mutual_cooperations[a, b] += 1
             self.mutual_cooperations[b, a] += 1
 
@@ -90,7 +92,6 @@ class AdaptiveSimulation:
                 out=np.zeros_like(self.mutual_cooperations),
                 where=self.frequencies != 0,
             ),
-            # ** 2,
             0.05,
         )
 
@@ -121,7 +122,7 @@ class AdaptiveSimulation:
 
         r = 0
 
-        for index in range(self.population):
+        for index in sample(range(self.population), k=self.population):
             partner = choices(
                 self.connections[index],
                 weights=weights[index, self.connections[index]],
