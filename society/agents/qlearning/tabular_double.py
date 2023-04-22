@@ -8,8 +8,6 @@ from society.agent import Agent
 
 
 class DoubleTabularQLearner(Agent):
-    sa = Agent.__init__
-
     def __init__(
         self,
         lookback: int = 1,
@@ -71,15 +69,17 @@ class DoubleTabularQLearner(Agent):
         new_state = self._to_state(history, opp_history)
 
         if random() < 0.5:
+            action = self._q_table1[new_state].argmax()
             self._q_table1[old_state][move1] += self._learning_rate * (
                 reward
-                + self._discount_factor * self._q_table2[new_state].max()
+                + self._discount_factor * self._q_table2[new_state][action]
                 - self._q_table1[old_state][move1]
             )
         else:
+            action = self._q_table2[new_state].argmax()
             self._q_table2[old_state][move1] += self._learning_rate * (
                 reward
-                + self._discount_factor * self._q_table1[new_state].max()
+                + self._discount_factor * self._q_table1[new_state][action]
                 - self._q_table2[old_state][move1]
             )
 
@@ -90,4 +90,4 @@ class DoubleTabularQLearner(Agent):
             file (str): A file path.
         """
 
-        np.savez(file, q_table=self._q_table)
+        np.savez(file, q_table1=self._q_table1, q_table2=self._q_table2)
