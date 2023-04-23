@@ -15,7 +15,11 @@ class AdaptiveSimulation:
     reward_histories: List[List[int]]
 
     def __init__(
-        self, agents: List[Agent], weights: np.ndarray, payoff_matrix=None
+        self,
+        agents: List[Agent],
+        weights: np.ndarray,
+        payoff_matrix=None,
+        threshold: float = 0.05,
     ) -> None:
         self.agents = agents
         self.population = len(self.agents)
@@ -31,6 +35,7 @@ class AdaptiveSimulation:
         self.payoff_matrix = (
             payoff_matrix if payoff_matrix is not None else PAYOFF_MATRIX
         )
+        self.threshold = threshold
 
     def reset(self) -> None:
         self.rewards = [
@@ -92,7 +97,7 @@ class AdaptiveSimulation:
                 out=np.zeros_like(self.mutual_cooperations),
                 where=self.frequencies != 0,
             ),
-            0.05,
+            self.threshold,
         )
 
     def get_weights_by_agent(self, weights=None):

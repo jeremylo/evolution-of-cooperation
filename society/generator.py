@@ -19,6 +19,7 @@ def do_run(
     payoff_matrix=None,
     metadata=None,
     generation_args=None,
+    threshold: float = 0.05,
 ) -> dict:
     # Generate a new population
     agents, weights_matrix, G = generate_population(
@@ -29,7 +30,7 @@ def do_run(
         agent.train()
 
     # Run a number of rounds
-    sim = AdaptiveSimulation(agents, weights_matrix, payoff_matrix)
+    sim = AdaptiveSimulation(agents, weights_matrix, payoff_matrix, threshold)
 
     # Run the training phase
     train_society_rewards = []
