@@ -10,5 +10,5 @@ class TitForTat(Agent):
         if not opp_history:
             return Action.COOPERATE
 
-        # Play the opponent's last action
+        # Play the opponent's previous action
         return opp_history[-1]

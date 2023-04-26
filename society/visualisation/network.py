@@ -108,7 +108,7 @@ def print_returns(returns):
         print(f"{str(agent) + ':':<20}{sum(returns[agent].values())}")
 
 
-def plot_degree_distribution(G, t=None):
+def plot_degree_distribution(G, title=None, fig=None):
     """Plots the degree distribution of a network.
 
     Code based on the documentation example available at the following URL:
@@ -116,16 +116,19 @@ def plot_degree_distribution(G, t=None):
 
     Args:
         G (networkx.Graph): The graph.
-        t (float, optional): The threshold. Defaults to None.
+        title (str, optional): The graph title. Defaults to None.
     """
 
     degree_sequence = sorted((d for _, d in G.degree()), reverse=True)
 
-    title = "Graph degree"
-    if t is not None:
-        title += f" (threshold={t})"
+    if title is None:
+        title = ""
 
-    fig = plt.figure(title, figsize=(8, 8))
+    if fig is None:
+        fig = plt.figure(title, figsize=(8, 8))
+        fig.tight_layout()
+
+    fig.suptitle(title)
 
     # Create a gridspec for adding subplots of different sizes
     axgrid = fig.add_gridspec(5, 4)
@@ -135,7 +138,7 @@ def plot_degree_distribution(G, t=None):
     pos = nx.spring_layout(Gcc, seed=10396953)
     nx.draw_networkx_nodes(Gcc, pos, ax=ax0, node_size=20)
     nx.draw_networkx_edges(Gcc, pos, ax=ax0, alpha=0.4)
-    ax0.set_title(f"Connected components of G (threshold={t})")
+    # ax0.set_title(f"Connected Components")
     ax0.set_axis_off()
 
     ax1 = fig.add_subplot(axgrid[3:, :2])
@@ -146,9 +149,44 @@ def plot_degree_distribution(G, t=None):
 
     ax2 = fig.add_subplot(axgrid[3:, 2:])
     ax2.bar(*np.unique(degree_sequence, return_counts=True))
-    ax2.set_title("Degree Histogram")
+    ax2.set_title("Degree Distribution")
     ax2.set_xlabel("Degree")
-    ax2.set_ylabel("# of Nodes")
+    ax2.set_ylabel("Node Count")
 
-    fig.tight_layout()
-    plt.show()
+    # plt.show()
+
+
+def get_graphs_at_thresholds(weights, thresholds, outfile=None):
+    edge_counts = []
+    clustering_coefficients = []
+    Ks = []
+
+    population = len(weights)
+    for threshold in thresholds:
+        edges = [
+            (i, j, weights[i][j])
+            for i in range(population)
+            for j in range(i + 1, population)
+            if i != j and weights[i][j] > threshold and weights[j][i] > threshold
+        ]
+
+        K = nx.Graph()
+        K.add_weighted_edges_from(edges)
+
+        if outfile:
+            nx.drawing.nx_pydot.write_dot(K, outfile)
+
+        edge_count = len(edges)
+        edge_counts.append(edge_count)
+
+        try:
+            clustering_coefficient = (
+                nx.algorithms.cluster.average_clustering(K) if edge_count > 0 else None
+            )
+        except:
+            clustering_coefficient = None
+
+        clustering_coefficients.append(clustering_coefficient)
+        Ks.append(K)
+
+    return Ks, edge_counts, clustering_coefficients

@@ -26,6 +26,12 @@ class DoubleTabularQLearner(Agent):
 
     @property
     def parameters(self) -> dict:
+        """Returns agent parameters.
+
+        Returns:
+            dict: Agent parameters.
+        """
+
         return {
             "lookback": self._lookback,
             "epsilon": self._epsilon,
@@ -35,9 +41,25 @@ class DoubleTabularQLearner(Agent):
 
     @property
     def _q_table(self):
+        """Sums both Q-tables.
+
+        Returns:
+            np.ndarray: The combined Q-table.
+        """
+
         return self._q_table1 + self._q_table2
 
     def _to_state(self, history: List[Action], opp_history: List[Action]) -> tuple:
+        """Constructs an agent state.
+
+        Args:
+            history (List[Action]): The agent's action history.
+            opp_history (List[Action]): The opponent's action history.
+
+        Returns:
+            tuple: The corresponding state.
+        """
+
         state = tuple(
             2 * a.value + b.value
             for a, b in zip(history[-self._lookback :], opp_history[-self._lookback :])
@@ -49,6 +71,16 @@ class DoubleTabularQLearner(Agent):
         return state
 
     def play_move(self, history: List[Action], opp_history: List[Action]) -> Action:
+        """Performs a move.
+
+        Args:
+            history (List[Action]): The agent's action history.
+            opp_history (List[Action]): The opponent's action history.
+
+        Returns:
+            Action: The action to make.
+        """
+
         # Play a random move
         if self.training and random() < self._epsilon:
             return choice((Action.COOPERATE, Action.DEFECT))
@@ -60,6 +92,14 @@ class DoubleTabularQLearner(Agent):
         ]
 
     def update(self, reward: int, history: List[Action], opp_history: List[Action]):
+        """Performs a weight update step.
+
+        Args:
+            reward (int): The reward.
+            history (List[Action]): The agent's action history.
+            opp_history (List[Action]): The opponent's action history.
+        """
+
         if len(history) <= self._lookback:
             return
 

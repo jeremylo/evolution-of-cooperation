@@ -7,4 +7,5 @@ from society.agent import Agent
 
 class Random(Agent):
     def play_move(self, history: List[Action], opp_history: List[Action]) -> Action:
+        # Select a move at random
         return choice([Action.COOPERATE, Action.DEFECT])

@@ -38,6 +38,8 @@ class AdaptiveSimulation:
         self.threshold = threshold
 
     def reset(self) -> None:
+        """Resets the simulation."""
+
         self.rewards = [
             [[] for j in range(self.population)] for i in range(self.population)
         ]
@@ -49,6 +51,17 @@ class AdaptiveSimulation:
         self.frequencies = np.zeros((self.population, self.population))
 
     def play_move(self, a, b, train=True):
+        """Simulates an interaction between two agents.
+
+        Args:
+            a (int): An agent index.
+            b (int): The opponent's index.
+            train (bool, optional): Whether to update agent weights. Defaults to True.
+
+        Returns:
+            int: The combined reward.
+        """
+
         move1 = self.agents[a].play_move(
             self.action_histories[a][b], self.action_histories[b][a]
         )
@@ -82,6 +95,12 @@ class AdaptiveSimulation:
         return reward1 + reward2
 
     def calculate_cooperativeness_proportions(self):
+        """Calculates the cooperativeness matrix.
+
+        Returns:
+            np.ndarray: A matrix.
+        """
+
         return np.divide(
             self.mutual_cooperations,
             self.frequencies,
@@ -90,6 +109,12 @@ class AdaptiveSimulation:
         )
 
     def calculate_weights(self):
+        """Computes the weight matrix.
+
+        Returns:
+            np.ndarray: The weight matrix.
+        """
+
         return np.maximum(
             np.divide(
                 self.mutual_cooperations,
@@ -101,12 +126,27 @@ class AdaptiveSimulation:
         )
 
     def get_weights_by_agent(self, weights=None):
+        """Produces a list of weights for the connections of each agent.
+
+        Args:
+            weights (np.ndarray, optional): A precomputed weight matrix. Defaults to None.
+
+        Returns:
+            List[List[float]]: A list of agents' edge weight lists.
+        """
+
         if weights is None:
             weights = self.calculate_weights()
 
         return [weights[i, self.connections[i]] for i in range(self.population)]
 
     def produce_weight_matrix(self):
+        """Produces the weight matrix.
+
+        Returns:
+            np.ndarray: The society weight matrix.
+        """
+
         weights = self.get_weights_by_agent()
 
         matrix = np.full((self.population, self.population), -np.inf)
@@ -118,6 +158,15 @@ class AdaptiveSimulation:
         return matrix
 
     def play_round(self, train=True) -> None:
+        """Simulates a single round.
+
+        Args:
+            train (bool, optional): Whether to update agent weights. Defaults to True.
+
+        Returns:
+            int: The aggregated society reward.
+        """
+
         weights = self.calculate_weights()
 
         if self.weights is not None:

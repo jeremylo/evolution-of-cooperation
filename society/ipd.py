@@ -21,9 +21,7 @@ def mutate_move(action: Action, noise: float):
 
 
 class Match:
-    def __init__(
-        self, agent1: Agent, agent2: Agent
-    ) -> None:
+    def __init__(self, agent1: Agent, agent2: Agent) -> None:
         self.agent1 = agent1
         self.agent2 = agent2
 
